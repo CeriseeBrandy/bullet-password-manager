@@ -872,3 +872,14 @@ h1 {
         filter: drop-shadow(0 0 5px rgba(255,255,255,0.7));
     }
 }
+/* 🔥 FIX SCROLL IOS */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+/* scroll uniquement dans le contenu */
+.content {
+    height: calc(100dvh - var(--bottom-nav-height));
+    overflow-y: auto;
+}
