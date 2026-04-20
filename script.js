@@ -58,6 +58,8 @@ async function checkMasterPassword() {
         bulletAlert(recoveryKey, "ARSENAL CREATED! Keep this key safe.", true);
 
         currentMasterPass = passInput;
+        unlockApp(); // 🔥 ENTRE DIRECT DANS L'APP
+        return;      // 🔥 évite double exécution
     } 
     else {
         try {
