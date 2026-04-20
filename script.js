@@ -630,11 +630,7 @@ function bulletAlert(title, message = "", isKey = false) {
 
     const overlay = document.createElement('div');
     overlay.id = 'bullet-modal-container';
-    overlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center;
-        align-items: center; z-index: 1000000; backdrop-filter: blur(4px);
-    `;
+    overlay.className = "modal-overlay";
 
     // Si c'est une clé, on prépare le HTML du bouton de copie
     let keyContent = "";
@@ -654,7 +650,7 @@ function bulletAlert(title, message = "", isKey = false) {
     const messageHTML = message ? `<p style="color: #eee; margin: 0 0 20px 0; font-family: 'Segoe UI', sans-serif; font-size: 0.75rem;">${message}</p>` : "";
 
     overlay.innerHTML = `
-    <div style="background:#050505;border-radius:25px;padding:50px 40px;width:550px;border:2px solid #fff;box-shadow:0 0 15px #fff,0 0 40px rgba(255,255,255,0.3),inset 0 0 20px rgba(255,255,255,0.05);text-align:center;">
+     <div class="custom-modal" style="background:#050505;">
 
         <h3 style="color:#fff;margin-bottom:30px;font-size:1.4rem;letter-spacing:6px;text-shadow:0 0 10px #fff,0 0 20px rgba(255,255,255,0.6);">
             ${title}
