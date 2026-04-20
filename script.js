@@ -15,16 +15,6 @@ const pwnedCache = {};
 let currentMasterPass = "";
 let cryptoKey = null;
 
-// --- AJOUT : Fonction pour générer la clé ---
-function generateRecoveryKey() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let key = "BULLET-";
-    for (let i = 0; i < 12; i++) {
-        if (i > 0 && i % 4 === 0) key += "-";
-        key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return key;
-}
 
 window.onload = () => {
     updateLoginUI();
@@ -42,7 +32,6 @@ async function checkMasterPassword() {
             return;
         }
 
-        const recoveryKey = generateRecoveryKey();
 
         localStorage.setItem('bullet_setup_done', 'true');
         localStorage.setItem('bullet_nick', nickInput);
@@ -52,10 +41,8 @@ async function checkMasterPassword() {
         const encrypted = await encryptVault(emptyVault, passInput);
         localStorage.setItem('bullet_vault', encrypted);
 
-        // recovery
-        localStorage.setItem('bullet_recovery_plain', recoveryKey);
 
-        bulletAlert(recoveryKey, "ARSENAL CREATED! Keep this key safe.", true);
+        bulletAlert("ARSENAL CREATED", "Your vault has been created successfully.");
 
         currentMasterPass = passInput;
         unlockApp(); // 🔥 ENTRE DIRECT DANS L'APP
@@ -78,130 +65,6 @@ async function checkMasterPassword() {
     }
 }
 
-// --- AJOUT : Fonction pour récupérer l'accès via la clé ---
-async function openRecoveryModal() {
-    const overlay = document.createElement('div');
-    overlay.className = "modal-overlay";
-
-   overlay.innerHTML = `
-    <div style="background:#050505;border-radius:25px;padding:50px 40px;width:500px;border:2px solid #fff;box-shadow:0 0 15px #fff,0 0 40px rgba(255,255,255,0.3),inset 0 0 20px rgba(255,255,255,0.05);text-align:center;">
-
-        <h3 style="color:#fff;margin-bottom:30px;font-size:1.2rem;letter-spacing:4px;text-shadow:0 0 10px #fff;">
-            EMERGENCY KEY
-        </h3>
-
-        <div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:20px;margin-bottom:25px;border:1px solid rgba(255,255,255,0.1);color:#aaa;font-size:0.8rem;">
-            Entrez votre clé pour récupérer votre accès
-        </div>
-
-        <input id="recovery-input" type="text" placeholder="BULLET-XXXX-XXXX-XXXX"
-        style="width:100%;box-sizing:border-box;padding:14px;background:#000;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:12px;text-align:center;font-family:monospace;margin-bottom:25px;outline:none;">
-
-        <div style="display:flex;justify-content:center;gap:20px;">
-            <button id="cancel-recovery" style="
-                background:#1a1a1a;
-                color:#aaa;
-                border:1px solid rgba(255,255,255,0.2);
-                padding:12px 25px;
-                border-radius:12px;
-                font-weight:900;
-                cursor:pointer;
-            ">
-                CANCEL
-            </button>
-
-            <button id="validate-recovery" style="
-                background:#fff;
-                color:#000;
-                border:none;
-                padding:12px 25px;
-                border-radius:12px;
-                font-weight:900;
-                cursor:pointer;
-                box-shadow:0 0 10px rgba(255,255,255,0.6);
-            ">
-                VALIDER
-            </button>
-        </div>
-
-    </div>
-`;
-
-    document.body.appendChild(overlay);
-
-    // ✅ CANCEL
-    document.getElementById('cancel-recovery').onclick = () => {
-        overlay.remove();
-    };
-
-    // ✅ VALIDER
-    document.getElementById('validate-recovery').onclick = async () => {
-        const inputKey = document.getElementById('recovery-input').value;
-        const savedKey = localStorage.getItem('bullet_recovery');
-
-        if (!savedKey) {
-            bulletAlert("ERROR", "No recovery key found.");
-            overlay.remove();
-            return;
-        }
-
-        const inputHash = await hashPassword(inputKey.trim().toUpperCase());
-        if (inputHash === savedKey) {
-            overlay.remove();
-            openNewPasswordModal();
-        } else {
-            bulletAlert("ERROR", "Invalid key.");
-        }
-    };
-}
-async function openNewPasswordModal() {
-    const overlay = document.createElement('div');
-    overlay.className = "modal-overlay";
-
-    overlay.innerHTML = `
-    <div style="background:#050505;border-radius:25px;padding:50px 40px;width:500px;border:2px solid #fff;box-shadow:0 0 15px #fff,0 0 40px rgba(255,255,255,0.3),inset 0 0 20px rgba(255,255,255,0.05);text-align:center;">
-
-        <h3 style="color:#fff;margin-bottom:30px;font-size:1.3rem;letter-spacing:4px;text-shadow:0 0 10px #fff;">
-            NEW PASSWORD
-        </h3>
-
-        <input id="new-pass" type="password" placeholder="New Password"
-        style="width:100%;box-sizing:border-box;padding:14px;background:#000;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:12px;margin-bottom:30px;outline:none;">
-
-        <button id="save-new-pass" style="
-            background:#fff;
-            color:#000;
-            border:none;
-            padding:14px 35px;
-            border-radius:15px;
-            font-weight:900;
-            cursor:pointer;
-            box-shadow:0 0 15px rgba(255,255,255,0.6);
-        ">
-            ENREGISTRER
-        </button>
-
-    </div>
-`;
-
-    document.body.appendChild(overlay);
-
-    document.getElementById('save-new-pass').onclick = async () => {
-        const newPass = document.getElementById('new-pass').value;
-
-        if (!newPass || newPass.length < 4) {
-            bulletAlert("ERROR", "Password too short.");
-            return;
-        }
-
-        const hashed = await hashPassword(newPass);
-        localStorage.setItem('bullet_pass', hashed);
-        overlay.remove();
-
-
-        bulletAlert("SUCCESS", "Password updated!");
-    };
-}
 
 document.addEventListener('keydown', (e) => {
     const loginScreen = document.getElementById('login-screen');
@@ -614,15 +477,6 @@ async function deleteVaultEntry(id) {
 };
 }
 
-function showRecoveryKey() {
-    const savedKey = localStorage.getItem('bullet_recovery_plain');
-    
-    if (!savedKey) {
-        bulletAlert("SYSTEM", "No recovery key found. Export your data and reset your vault.");
-    } else {
-        bulletAlert(savedKey, "Here is your recovery key. Keep it safe.", true);
-    }
-}
 // ==========================================
 // 7. SYSTÈME DE NOTIFICATIONS TACTIQUES
 // ==========================================
@@ -724,22 +578,21 @@ let cachedVault = null;
 
 async function getVault() {
 
-    // 🔥 AJOUT ICI (dans la fonction)
     if (!currentMasterPass) {
         console.warn("No master password loaded");
         return [];
     }
 
-    if (cachedVault) return cachedVault;
+    const encrypted = localStorage.getItem("bullet_vault");
+
+    if (!encrypted) return [];
 
     try {
-        const encrypted = localStorage.getItem("bullet_vault");
-
-        if (!encrypted) return [];
-
         const vault = await decryptVault(encrypted, currentMasterPass);
 
+        // 🔥 toujours refresh le cache avec la vraie valeur
         cachedVault = Array.isArray(vault) ? vault : [];
+
         return cachedVault;
 
     } catch (e) {
@@ -818,13 +671,13 @@ function exportVault() {
     document.getElementById('confirm-export').onclick = async () => {
         const inputPass = document.getElementById('export-pass').value;
 
-        const hashedInput = await hashPassword(inputPass);
-        const savedPass = localStorage.getItem('bullet_pass');
-
-        if (hashedInput !== savedPass) {
-            bulletAlert("ERROR", "Wrong password.");
-            return;
-        }
+        try {
+    const encrypted = localStorage.getItem('bullet_vault');
+    await decryptVault(encrypted, inputPass);
+} catch (e) {
+    bulletAlert("ERROR", "Wrong password.");
+    return;
+}
 
         const data = localStorage.getItem('bullet_vault');
 
@@ -911,31 +764,138 @@ function openImportModal(encryptedData) {
     document.getElementById('confirm-import').onclick = async () => {
         const inputPass = document.getElementById('import-pass').value;
 
-        const hashedInput = await hashPassword(inputPass);
-        const savedPass = localStorage.getItem('bullet_pass');
-
-        if (hashedInput !== savedPass) {
-            return bulletAlert("ERROR", "Wrong password.");
-        }
-
+        try {
+    const encrypted = localStorage.getItem('bullet_vault');
+    await decryptVault(encrypted, inputPass);
+} catch (e) {
+    bulletAlert("ERROR", "Wrong password.");
+    return;
+}
         try {
             // 🔐 charger la clé AES
             await loadCryptoKey(inputPass);
 
             // 🔓 tenter le déchiffrement
-            const vault = await decryptVault(encryptedData);
+            const vault = await decryptVault(encryptedData, inputPass);
 
             if (!Array.isArray(vault)) {
                 throw new Error("Invalid vault");
             }
 
             // ✔ sauvegarde
-            localStorage.setItem('bullet_vault', encryptedData);
+            function importVault() {
+    const fileInput = document.getElementById('import-file');
 
-            overlay.remove();
-            loadVault();
+    if (!fileInput.files.length) {
+        return bulletAlert("ERROR", "Select a file.");
+    }
 
-            bulletAlert("SUCCESS", "Backup imported!");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const encryptedData = e.target.result;
+
+        openImportModal(encryptedData);
+    };
+
+    reader.readAsText(file);
+}
+function openImportModal(encryptedData) {
+    const overlay = document.createElement('div');
+    overlay.className = "modal-overlay";
+
+    overlay.innerHTML = `
+        <div style="
+            background:#050505;
+            border-radius:25px;
+            padding:50px 40px;
+            width:500px;
+            border:2px solid #fff;
+            box-shadow:0 0 15px #fff,0 0 40px rgba(255,255,255,0.3),inset 0 0 20px rgba(255,255,255,0.05);
+            text-align:center;
+        ">
+
+            <h3 style="
+                color:#fff;
+                margin-bottom:30px;
+                font-size:1.2rem;
+                letter-spacing:4px;
+                text-shadow:0 0 10px #fff;
+            ">
+                IMPORT BACKUP
+            </h3>
+
+            <input type="password" id="import-pass" placeholder="Master Password"
+                style="
+                    width:90%;
+                    padding:15px;
+                    border-radius:20px;
+                    border:1px solid rgba(255,255,255,0.15);
+                    background:rgba(255,255,255,0.05);
+                    color:#fff;
+                    outline:none;
+                    margin:0 auto 30px auto;
+                    display:block;
+                ">
+
+            <div style="display:flex;justify-content:center;gap:20px;">
+                <button id="cancel-import">CANCEL</button>
+                <button id="confirm-import">IMPORT</button>
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById('cancel-import').onclick = () => overlay.remove();
+
+    document.getElementById('confirm-import').onclick = async () => {
+        const inputPass = document.getElementById('import-pass').value;
+
+        try {
+    const encrypted = localStorage.getItem('bullet_vault');
+    await decryptVault(encrypted, inputPass);
+} catch (e) {
+    bulletAlert("ERROR", "Wrong password.");
+    return;
+}
+        try {
+            // 🔐 charger la clé AES
+            await loadCryptoKey(inputPass);
+
+            // 🔓 tenter le déchiffrement
+            const vault = await decryptVault(encryptedData, inputPass);
+
+            if (!Array.isArray(vault)) {
+                throw new Error("Invalid vault");
+            }
+
+            // ✔ sauvegarde
+                  localStorage.setItem('bullet_vault', encryptedData);
+
+cachedVault = null; // 🔥 IMPORTANT
+
+currentMasterPass = inputPass;
+
+await loadCryptoKey(inputPass);
+await loadVault();
+
+overlay.remove();
+
+bulletAlert("SUCCESS", "Backup imported!");
+                  
+              
+
+        } catch (err) {
+            bulletAlert("ERROR", "Invalid password or corrupted file.");
+        }
+    };
+}
+document.getElementById('import-file').addEventListener('change', function() {
+    const fileName = this.files[0]?.name || "No files selected";
+});
         } catch (err) {
             bulletAlert("ERROR", "Invalid password or corrupted file.");
         }
@@ -1055,13 +1015,13 @@ if (remember === "true") {
         document.getElementById('confirm-import').onclick = async () => {
             const inputPass = document.getElementById('import-pass').value;
 
-            const hashedInput = await hashPassword(inputPass);
-            const savedPass = localStorage.getItem('bullet_pass');
-
-            if (hashedInput !== savedPass) {
-                bulletAlert("Incorrect password");
-                return;
-            }
+            try {
+    const encrypted = localStorage.getItem('bullet_vault');
+    await decryptVault(encrypted, inputPass);
+} catch (e) {
+    bulletAlert("ERROR", "Wrong password.");
+    return;
+}
 
             localStorage.setItem('bullet_vault', fileContent);
             loadVault();
@@ -1332,5 +1292,43 @@ function updateLoginUI() {
         btn.style.background = "";
         btn.style.color = "";
         if (warning) warning.style.display = "none";
+    }
+}
+// ============================================
+// EXPORT — Compatible iOS + Desktop
+// ============================================
+function downloadFile(content, filename) {
+    const blob = new Blob([content], { type: 'application/json' });
+
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isIOS) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            const dataUrl = reader.result;
+
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // fallback iOS
+            setTimeout(() => {
+                window.open(dataUrl, '_blank');
+            }, 300);
+        };
+        reader.readAsDataURL(blob);
+    } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 }
