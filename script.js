@@ -879,6 +879,96 @@ function exportVault() {
             return;
         }
 
+        function exportVault() {
+    const overlay = document.createElement('div');
+    overlay.className = "modal-overlay";
+
+    overlay.innerHTML = `
+    <div style="
+        background:#050505;
+        border-radius:25px;
+        padding:50px 40px;
+        width:500px;
+        border:2px solid #fff;
+        box-shadow:0 0 15px #fff,0 0 40px rgba(255,255,255,0.3),inset 0 0 20px rgba(255,255,255,0.05);
+        text-align:center;
+    ">
+
+        <h3 style="
+            color:#fff;
+            margin-bottom:30px;
+            font-size:1.2rem;
+            letter-spacing:4px;
+            text-shadow:0 0 10px #fff;
+        ">
+            CONFIRMATION EXPORT
+        </h3>
+
+        <input type="password" id="export-pass" placeholder="Master Password"
+            style="
+                width:90%;
+                padding:15px;
+                border-radius:20px;
+                border:1px solid rgba(255,255,255,0.15);
+                background:rgba(255,255,255,0.05);
+                color:#fff;
+                outline:none;
+                margin-bottom:30px;
+                box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+            ">
+
+        <div style="display:flex;justify-content:center;gap:20px;">
+            <button id="cancel-export" style="
+                background:#1a1a1a;
+                color:#aaa;
+                border:1px solid rgba(255,255,255,0.2);
+                padding:12px 25px;
+                border-radius:12px;
+                font-weight:900;
+                cursor:pointer;
+            ">
+                CANCEL
+            </button>
+
+            <button id="confirm-export" style="
+                background:#fff;
+                color:#000;
+                border:none;
+                padding:12px 25px;
+                border-radius:12px;
+                font-weight:900;
+                cursor:pointer;
+                box-shadow:0 0 10px rgba(255,255,255,0.6);
+            ">
+                EXPORTER
+            </button>
+        </div>
+
+    </div>
+`;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById('cancel-export').onclick = () => overlay.remove();
+
+    document.getElementById('confirm-export').onclick = async () => {
+        const inputPass = document.getElementById('export-pass').value;
+
+        const hashedInput = await hashPassword(inputPass);
+        const savedPass = localStorage.getItem('bullet_pass');
+
+        if (hashedInput !== savedPass) {
+            bulletAlert("ERROR", "Wrong password.");
+            return;
+        }
+
+        const data = localStorage.getItem('bullet_vault');
+
+        if (!data) {
+            bulletAlert("ERROR", "No data.");
+            return;
+        }
+
         const blob = new Blob([data], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
 
@@ -888,6 +978,11 @@ function exportVault() {
         a.click();
 
         URL.revokeObjectURL(url);
+
+        overlay.remove();
+        bulletAlert("EXPORT", "Backup downloaded!");
+    };
+}
 
         overlay.remove();
         bulletAlert("EXPORT", "Backup downloaded!");
