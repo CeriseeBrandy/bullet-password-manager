@@ -903,6 +903,7 @@ html, body {
 
     z-index: 99999;
     overflow: hidden;
+    padding: 12px;
 }
 
 /* Desktop */
@@ -966,4 +967,22 @@ html, body {
     .modal-overlay > div::before {
         display: none;
     }
+}
+/* 🔥 FIX GLOBAL MODALS */
+.modal-overlay > div,
+.custom-modal {
+    width: 92% !important;
+    max-width: 420px !important;
+
+    margin: 0 auto;
+
+    max-height: 85dvh !important;
+
+    border-radius: 20px !important;
+
+    padding: 20px !important;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+
+    overflow-y: auto;
+    box-sizing: border-box !important;
 }
