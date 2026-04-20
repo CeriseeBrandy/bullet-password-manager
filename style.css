@@ -882,32 +882,91 @@ html, body {
 .content {
     height: calc(100dvh - var(--bottom-nav-height));
     overflow-y: auto;
-/* 🔥 POPUP MOBILE FIX */
-.modal-overlay > div {
-    width: 90% !important;
-    max-width: 350px !important;
+}
+/* ===========================
+   MODALS — MOBILE FIX
+   =========================== */
 
-    padding: 25px 20px !important;
-    border-radius: 20px !important;
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    z-index: 99999;
+    overflow: hidden;
 }
 
-/* titre */
+/* Desktop */
+@media (min-width: 768px) {
+    .modal-overlay {
+        align-items: center;
+        padding: 20px;
+    }
+}
+
+/* Contenu modal */
+.modal-overlay > div {
+    width: 100% !important;
+    max-width: 480px !important;
+    max-height: 90dvh !important;
+
+    border-radius: 20px 20px 0 0 !important;
+    padding: 25px 20px !important;
+
+    overflow-y: auto;
+    box-sizing: border-box !important;
+}
+
+/* Titre */
 .modal-overlay h3 {
     font-size: 1rem !important;
     letter-spacing: 2px !important;
 }
 
-/* input */
+/* Inputs */
 .modal-overlay input {
     width: 100% !important;
     padding: 12px !important;
-    font-size: 14px !important;
+    font-size: 16px !important; /* évite zoom iOS */
+    border-radius: 12px !important;
 }
 
-/* boutons */
+/* Boutons */
 .modal-overlay button {
     padding: 10px 18px !important;
-    font-size: 0.75rem !important;
+    font-size: 0.8rem !important;
 }
 
+/* Petite barre en haut (style iPhone) */
+.modal-overlay > div::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 0 auto 15px auto;
+}
+
+/* Desktop ajustements */
+@media (min-width: 768px) {
+    .modal-overlay > div {
+        max-width: 500px !important;
+        border-radius: 16px !important;
+        max-height: 85vh !important;
+        padding: 35px !important;
+    }
+
+    .modal-overlay > div::before {
+        display: none;
+    }
 }
