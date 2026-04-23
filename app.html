@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bullet — Password Manager</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+
+<div class="app-wrap">
+  <nav class="sidebar">
+    <svg class="sidebar-radar" viewBox="0 0 400 400" fill="none">
+      <circle cx="200" cy="200" r="190" stroke="white" stroke-width="1"/>
+      <circle cx="200" cy="200" r="140" stroke="white" stroke-width="0.5"/>
+      <circle cx="200" cy="200" r="90" stroke="white" stroke-width="0.8"/>
+      <circle cx="200" cy="200" r="45" stroke="white" stroke-width="0.5"/>
+      <line x1="200" y1="10" x2="200" y2="390" stroke="white" stroke-width="0.5"/>
+      <line x1="10" y1="200" x2="390" y2="200" stroke="white" stroke-width="0.5"/>
+      <line x1="55" y1="55" x2="345" y2="345" stroke="white" stroke-width="0.4"/>
+      <line x1="345" y1="55" x2="55" y2="345" stroke="white" stroke-width="0.4"/>
+    </svg>
+    <div class="s-logo"><img src="assets/icon.png" alt="Bullet"><span>BULLET</span></div>
+    <div class="s-menu">
+      <div id="btn-generator" class="s-item active" onclick="showSection('generator')"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Generator</span></div>
+      <div id="btn-vault" class="s-item" onclick="showSection('vault')"><i class="fa-solid fa-vault"></i><span>Vault</span></div>
+      <div id="btn-backup" class="s-item" onclick="showSection('backup')"><i class="fa-solid fa-box-archive"></i><span>Backup</span></div>
+      <div id="btn-about" class="s-item" onclick="showSection('about')"><i class="fa-solid fa-lock"></i><span>Security</span></div>
+      <div id="btn-settings" class="s-item" onclick="showSection('settings')"><i class="fa-solid fa-gear"></i><span>Settings</span></div>
+    </div>
+    <div class="s-footer">
+      <div class="s-footer-dot"><span class="status-dot"></span>OPERATIONAL</div>
+      AES-256 · OFFLINE · PWA
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="main-topbar">
+      <div class="main-topbar-title" id="topbar-title">Generator</div>
+      <div class="main-topbar-right">
+        <button class="topbar-btn" onclick="lockApp()" title="Lock"><i class="fa-solid fa-lock"></i></button>
+        <button class="topbar-btn" id="install-btn" onclick="installApp()" title="Install PWA"><i class="fa-solid fa-download"></i></button>
+      </div>
+    </div>
+
+    <div class="view-area">
+
+      <!-- GENERATOR -->
+      <section id="generator-view" class="view-section active">
+  <div class="gen-center">
+
+    <div class="s-eyebrow" style="justify-content:center;margin-bottom:6px;">
+      Ammunition
+    </div>
+
+    <div class="gen-title">GENERATOR</div>
+    <div class="gen-subtitle">Craft a secure password</div>
+
+    <div class="gen-card">
+
+      <!-- DISPLAY + COPY -->
+      <div class="pass-row">
+        <input type="text" id="pass-display" readonly placeholder="GENERATE A PASSWORD">
+
+        <button id="copy-btn" onclick="copyGenerated()" title="Copy">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>
+
+      <!-- LENGTH -->
+      <div class="slider-label">
+        <span>Length</span>
+        <span id="length-val">16</span>
+      </div>
+
+      <input
+        type="range"
+        id="length-slider"
+        min="8"
+        max="40"
+        value="16"
+        oninput="updateLength(this.value)"
+      >
+
+      <!-- OPTIONS -->
+      <div class="switches-row">
+        <label><input type="checkbox" id="check-letters" checked> Letters (Aa)</label>
+        <label><input type="checkbox" id="check-numbers" checked> Numbers</label>
+        <label><input type="checkbox" id="check-symbols" checked> Symbols</label>
+        <label><input type="checkbox" id="exclude-similar"> Exclude similar (0 O 1 l I)</label>
+      </div>
+
+      <!-- GENERATE -->
+      <button id="gen-btn" onclick="generatePassword()">
+        GENERATE PASSWORD
+      </button>
+
+    </div>
+  </div>
+</section>
+
+      <!-- VAULT -->
+      <section id="vault-view" class="view-section">
+        <div class="s-eyebrow" style="margin-bottom:6px;">Arsenal</div>
+        <div class="gen-title" style="font-size:32px;letter-spacing:2px;margin-bottom:24px;">VAULT</div>
+        <div class="vault-form-card">
+          <div class="vault-inputs">
+            <input type="text" id="vault-site" placeholder="URL (ex: twitch.tv)">
+            <input type="text" id="vault-user" placeholder="Username / Email">
+            <input type="text" id="vault-pass" placeholder="Password" autocomplete="new-password">
+            <button class="btn-white" onclick="addEntryToVault()" style="white-space:nowrap;flex-shrink:0;"><i class="fa-solid fa-plus" style="margin-right:6px;"></i>Add</button>
+          </div>
+        </div>
+        <div class="vault-search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="vault-search" type="text" placeholder="Search..." />
+        </div>
+        <div class="vault-meta"><span class="vault-count" id="vault-count"></span></div>
+        <div id="vault-list"></div>
+      </section>
+
+      <!-- BACKUP -->
+      <section id="backup-view" class="view-section">
+        <div class="s-eyebrow" style="margin-bottom:6px;">Data</div>
+        <div class="gen-title" style="font-size:32px;letter-spacing:2px;margin-bottom:8px;">BACKUP</div>
+        <p style="font-size:13px;font-weight:300;color:var(--text-dim);margin-bottom:32px;max-width:520px;line-height:1.7;">Your vault is encrypted locally. Export a copy to keep it safe, or restore from a previous backup.</p>
+        <div class="backup-grid">
+          <div class="b-card" style="display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+              <div style="width:44px;height:44px;background:rgba(255,255,255,.05);border:.5px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-file-arrow-down" style="font-size:18px;color:var(--text-dim);"></i></div>
+              <div><h3 style="margin-bottom:3px;">EXPORT BACKUP</h3><div style="font-size:12px;font-weight:300;color:var(--text-faint);">Encrypted · .bullet file</div></div>
+            </div>
+            <p style="margin-bottom:24px;flex:1;">Save your entire vault as an encrypted <span style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(255,255,255,.35);">.bullet</span> file. Your master password is required to confirm.</p>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.02);border:.5px solid var(--border);border-radius:var(--radius-md);margin-bottom:20px;">
+              <i class="fa-solid fa-shield-halved" style="font-size:11px;color:var(--text-faint);"></i>
+              <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-faint);">AES-256 encrypted</span>
+            </div>
+            <button class="btn-white" onclick="exportVault()" style="width:100%;"><i class="fa-solid fa-file-export" style="margin-right:8px;"></i>Export Backup</button>
+          </div>
+          <div class="b-card" style="display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+              <div style="width:44px;height:44px;background:rgba(255,255,255,.05);border:.5px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-file-arrow-up" style="font-size:18px;color:var(--text-dim);"></i></div>
+              <div><h3 style="margin-bottom:3px;">IMPORT BACKUP</h3><div style="font-size:12px;font-weight:300;color:var(--text-faint);">Restore · .bullet / .json</div></div>
+            </div>
+            <p style="margin-bottom:24px;flex:1;">Restore from a previous backup. Your current vault will be replaced. The backup master password will be required.</p>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,204,0,.04);border:.5px solid rgba(255,204,0,.18);border-radius:var(--radius-md);margin-bottom:20px;">
+              <i class="fa-solid fa-triangle-exclamation" style="font-size:11px;color:rgba(255,204,0,.6);"></i>
+              <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,204,0,.55);">Overwrites current data</span>
+            </div>
+            <input type="file" id="import-file" accept=".json,.bullet" style="display:none;" onchange="importVault()">
+            <button class="btn-ghost" onclick="triggerImport()" style="width:100%;"><i class="fa-solid fa-file-import" style="margin-right:8px;"></i>Import Backup</button>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:20px 24px;background:rgba(255,255,255,.02);border:.5px solid var(--border);border-radius:var(--radius-lg);display:flex;align-items:center;gap:16px;">
+          <i class="fa-solid fa-circle-info" style="color:var(--text-faint);font-size:14px;flex-shrink:0;"></i>
+          <div style="font-size:12px;font-weight:300;color:var(--text-faint);line-height:1.7;">Backup files are fully encrypted with AES-256. Without the master password, they are unreadable.</div>
+        </div>
+      </section>
+
+      <!-- SECURITY -->
+      <section id="about-view" class="view-section">
+        <div class="s-eyebrow" style="margin-bottom:6px;">Intel</div>
+        <div class="gen-title" style="font-size:32px;letter-spacing:2px;margin-bottom:8px;">SECURITY</div>
+        <p style="font-size:13px;font-weight:300;color:var(--text-dim);margin-bottom:36px;max-width:520px;line-height:1.7;">How Bullet protects your data — and what you should know.</p>
+        <div class="security-stats-bar">
+          <div style="padding:20px 24px;background:rgba(255,255,255,.03);text-align:center;border-right:.5px solid var(--border);">
+            <div style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;margin-bottom:4px;">AES-256</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);">Encryption</div>
+          </div>
+          <div style="padding:20px 24px;background:rgba(255,255,255,.03);text-align:center;border-right:.5px solid var(--border);">
+            <div style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;margin-bottom:4px;">0KB</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);">Data Sent</div>
+          </div>
+          <div style="padding:20px 24px;background:rgba(255,255,255,.03);text-align:center;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;margin-bottom:4px;">100%</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);">Offline</div>
+          </div>
+        </div>
+        <div class="security-grid">
+          <div class="b-card">
+            <div class="security-card-inner">
+              <div class="security-icon-wrap"><i class="fa-solid fa-hard-drive" style="font-size:18px;color:var(--text-dim);"></i></div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                  <h3 style="margin:0;">LOCAL STORAGE</h3>
+                  <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;background:rgba(50,215,75,.1);border:.5px solid rgba(50,215,75,.25);color:var(--safe);padding:2px 8px;border-radius:var(--radius-pill);">ACTIVE</span>
+                </div>
+                <p>All your data is stored exclusively on your device. No server, no cloud, no tracking. Your vault never leaves your machine.</p>
+                <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;">
+                  <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;border:.5px solid var(--border);padding:3px 10px;border-radius:var(--radius-pill);color:var(--text-faint);">No server</span>
+                  <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;border:.5px solid var(--border);padding:3px 10px;border-radius:var(--radius-pill);color:var(--text-faint);">No cloud</span>
+                  <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;border:.5px solid var(--border);padding:3px 10px;border-radius:var(--radius-pill);color:var(--text-faint);">PBKDF2 · 150k iter.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="b-card">
+            <div class="security-card-inner">
+              <div class="security-icon-wrap"><i class="fa-solid fa-magnifying-glass" style="font-size:18px;color:var(--text-dim);"></i></div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                  <h3 style="margin:0;">HIBP LEAK CHECK</h3>
+                  <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;background:rgba(50,215,75,.1);border:.5px solid rgba(50,215,75,.25);color:var(--safe);padding:2px 8px;border-radius:var(--radius-pill);">K-ANON</span>
+                </div>
+                <p>Passwords verified via Have I Been Pwned using k-anonymity. Only the first 5 chars of the SHA-1 hash are sent — your full password never leaves your device.</p>
+                <div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.02);border:.5px solid var(--border);border-radius:var(--radius-md);">
+                  <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text-faint);letter-spacing:1px;">hash(password) → send only first 5 chars → compare locally</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="b-card" style="border-color:rgba(255,204,0,.12);">
+            <div class="security-card-inner">
+              <div class="security-icon-wrap" style="background:rgba(255,204,0,.05);border-color:rgba(255,204,0,.2);"><i class="fa-solid fa-triangle-exclamation" style="font-size:18px;color:rgba(255,204,0,.65);"></i></div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                  <h3 style="margin:0;">LIMITATIONS</h3>
+                  <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;background:rgba(255,204,0,.07);border:.5px solid rgba(255,204,0,.2);color:rgba(255,204,0,.65);padding:2px 8px;border-radius:var(--radius-pill);">READ</span>
+                </div>
+                <p>Leak check only flags passwords seen in known breaches. It cannot confirm if your specific account was compromised. Use a strong master password and secure your device.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings-view" class="view-section">
+        <div class="s-eyebrow" style="margin-bottom:6px;">Configuration</div>
+        <div class="gen-title" style="font-size:32px;letter-spacing:2px;margin-bottom:8px;">SETTINGS</div>
+        <p style="font-size:13px;font-weight:300;color:var(--text-dim);margin-bottom:32px;max-width:520px;line-height:1.7;">Configure Bullet to match your security preferences.</p>
+        <div class="b-card" style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+            <div style="width:40px;height:40px;background:rgba(255,255,255,.04);border:.5px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-regular fa-clock" style="font-size:16px;color:var(--text-dim);"></i></div>
+            <div><h3 style="margin-bottom:2px;">AUTO-LOCK TIMER</h3><div style="font-size:12px;font-weight:300;color:var(--text-faint);">Inactivity timeout</div></div>
+          </div>
+          <div class="settings-row">
+            <p style="flex:1;font-size:13px;font-weight:300;color:var(--text-dim);line-height:1.6;">Lock automatically after a period of inactivity.</p>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+              <input type="number" id="inactivity-time" min="1" max="60" value="2">
+              <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);white-space:nowrap;">min</span>
+            </div>
+          </div>
+        </div>
+        <div class="b-card" style="margin-bottom:12px;">
+          <div class="settings-row">
+            <div style="display:flex;align-items:center;gap:16px;">
+              <div style="width:40px;height:40px;background:rgba(255,255,255,.04);border:.5px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-lock" style="font-size:15px;color:var(--text-dim);"></i></div>
+              <div>
+                <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:4px;">LOCK SESSION</div>
+                <p style="font-size:13px;font-weight:300;color:var(--text-dim);">Return to the login page immediately.</p>
+              </div>
+            </div>
+            <button class="btn-ghost" onclick="lockApp()" style="white-space:nowrap;flex-shrink:0;"><i class="fa-solid fa-lock" style="margin-right:8px;"></i>Lock Now</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin:24px 0;">
+          <div style="flex:1;height:.5px;background:var(--border);"></div>
+          <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-faint);">Danger zone</span>
+          <div style="flex:1;height:.5px;background:var(--border);"></div>
+        </div>
+        <div class="b-card" style="border-color:rgba(255,69,58,.15);">
+          <div class="settings-row">
+            <div style="display:flex;align-items:center;gap:16px;">
+              <div style="width:40px;height:40px;background:rgba(255,69,58,.06);border:.5px solid rgba(255,69,58,.2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-triangle-exclamation" style="font-size:15px;color:var(--danger);"></i></div>
+              <div>
+                <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:4px;color:var(--danger);">RESET VAULT</div>
+                <p style="font-size:13px;font-weight:300;color:var(--text-dim);">Permanently erase all local data. Cannot be undone.</p>
+              </div>
+            </div>
+            <button class="btn-ghost" onclick="resetApplication()" style="white-space:nowrap;flex-shrink:0;color:var(--danger);border-color:rgba(255,69,58,.3);"><i class="fa-solid fa-trash" style="margin-right:8px;"></i>Reset All</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-topbar">
+  <div class="mob-logo"><img src="assets/icon.png" alt="Bullet"> BULLET</div>
+  <button class="hamburger-btn" id="hamburger-btn" onclick="toggleSlideNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+<div class="slide-nav-overlay" id="slide-nav-overlay" onclick="closeSlideNav()"></div>
+<nav class="slide-nav" id="slide-nav">
+  <div class="slide-nav-header"><img src="assets/icon.png" alt="Bullet"><span>BULLET</span></div>
+  <button class="slide-nav-item active" id="mob-btn-generator" onclick="showSection('generator');closeSlideNav()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generator</button>
+  <button class="slide-nav-item" id="mob-btn-vault" onclick="showSection('vault');closeSlideNav()"><i class="fa-solid fa-vault"></i> Vault</button>
+  <button class="slide-nav-item" id="mob-btn-backup" onclick="showSection('backup');closeSlideNav()"><i class="fa-solid fa-box-archive"></i> Backup</button>
+  <button class="slide-nav-item" id="mob-btn-about" onclick="showSection('about');closeSlideNav()"><i class="fa-solid fa-shield-halved"></i> Security</button>
+  <button class="slide-nav-item" id="mob-btn-settings" onclick="showSection('settings');closeSlideNav()"><i class="fa-solid fa-gear"></i> Settings</button>
+</nav>
+
+<script src="/scripts/crypto.js"></script>
+<script src="/scripts/vault.js"></script>
+<script src="/scripts/session.js"></script>
+<script src="/scripts/pwa.js"></script>
+<script src="/scripts/core.js"></script>
+<script src="/scripts/ui.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bullet — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+/* ===================== RESET ===================== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; }
+
+/* ===================== VARIABLES ===================== */
+:root {
+  --bg:             #0a0a0a;
+  --card:           rgba(255,255,255,0.04);
+  --card-hover:     rgba(255,255,255,0.06);
+  --border:         rgba(255,255,255,0.10);
+  --border-bright:  rgba(255,255,255,0.25);
+  --text:           #ffffff;
+  --text-dim:       rgba(255,255,255,0.45);
+  --text-faint:     rgba(255,255,255,0.22);
+  --radius-input:   10px;
+  --radius-card:    20px;
+  --radius-pill:    50px;
+}
+
+/* ===================== BODY ===================== */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Bruit de fond */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  pointer-events:none; opacity:.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ===================== NAV ===================== */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  display: flex; align-items:center; justify-content:space-between;
+  padding: 20px 48px;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.nav-logo {
+  display:flex; align-items:center; gap:10px;
+  font-family:'Bebas Neue', cursive;
+  font-size:22px; letter-spacing:4px; color:var(--text);
+  text-decoration:none;
+}
+.nav-logo img { width:28px; height:28px; object-fit:contain; }
+
+.nav-links { display:flex; gap:36px; list-style:none; }
+.nav-links a {
+  font-family:'Space Mono', monospace;
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-dim); text-decoration:none;
+  transition:color .2s;
+}
+.nav-links a:hover { color:var(--text); }
+
+.nav-cta {
+  font-family:'Space Mono', monospace;
+  font-size:10px; letter-spacing:1px; text-transform:uppercase;
+  background:var(--text); color:#000;
+  padding:10px 22px; border-radius:var(--radius-pill);
+  text-decoration:none; font-weight:700;
+  transition:transform .2s, box-shadow .2s;
+}
+.nav-cta:hover { transform:scale(1.04); box-shadow:0 0 24px rgba(255,255,255,.25); }
+
+/* Hamburger mobile */
+.hamburger {
+  display:none; flex-direction:column; gap:5px;
+  cursor:pointer; background:none; border:none; padding:4px;
+}
+.hamburger span {
+  width:22px; height:1.5px; background:var(--text);
+  display:block; transition:transform .3s, opacity .3s;
+}
+
+/* ===================== LAYOUT SPLIT ===================== */
+.login-page {
+  position:relative; z-index:1;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  padding-top: 64px; /* nav height */
+}
+
+/* ---- LEFT PANEL ---- */
+.left-panel {
+  display:flex; flex-direction:column;
+  justify-content:space-between;
+  padding: 64px 56px 48px;
+  position:relative;
+}
+
+.left-content { flex:1; display:flex; flex-direction:column; justify-content:center; }
+
+/* Eyebrow */
+.eyebrow {
+  font-family:'Space Mono', monospace;
+  font-size:10px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--text-dim); margin-bottom:28px;
+  display:flex; align-items:center; gap:12px;
+}
+.eyebrow::before { content:''; width:28px; height:0.5px; background:var(--text-dim); }
+
+/* Big title */
+.hero-title {
+  font-family:'Bebas Neue', cursive;
+  font-size: clamp(60px, 8vw, 100px);
+  line-height:.92; letter-spacing:2px;
+  margin-bottom:28px;
+  animation: fadeUp .7s .1s ease both;
+}
+
+.hero-sub {
+  font-size:15px; font-weight:300; line-height:1.8;
+  color:var(--text-dim); max-width:280px;
+  animation: fadeUp .7s .25s ease both;
+}
+
+/* Bottom-left info block */
+.left-footer {
+  padding-top:48px;
+  animation: fadeUp .7s .4s ease both;
+}
+.left-footer-label {
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--text-dim); margin-bottom:12px;
+  display:flex; align-items:center; gap:8px;
+}
+.status-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:#fff; box-shadow:0 0 6px rgba(255,255,255,.8);
+  flex-shrink:0;
+}
+.left-footer-specs {
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-faint); line-height:1.9;
+}
+
+/* ---- RIGHT PANEL ---- */
+.right-panel {
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+  padding: 48px 56px 48px 24px;
+  overflow:hidden;
+}
+
+/* Radar SVG en fond */
+.radar-bg {
+  position:absolute;
+  right:-80px; top:50%;
+  transform: translateY(-50%);
+  width:700px; height:700px;
+  opacity:.07;
+  pointer-events:none;
+  animation: slowSpin 90s linear infinite;
+}
+@keyframes slowSpin { to { transform:translateY(-50%) rotate(360deg); } }
+
+/* Sweep lumineux du radar */
+.radar-sweep {
+  position:absolute;
+  right:-80px; top:50%;
+  transform-origin: 350px 350px;
+  width:700px; height:700px;
+  pointer-events:none;
+  animation: sweep 6s linear infinite;
+  opacity:.15;
+}
+.radar-sweep line {
+  stroke: white;
+  stroke-width: 1.5;
+}
+@keyframes sweep { from { transform:translateY(-50%) rotate(0deg); } to { transform:translateY(-50%) rotate(360deg); } }
+
+/* Coin déco bottom-right (comme sur le screen) */
+.corner-status {
+  position:absolute; bottom:40px; right:48px;
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-faint); text-align:right;
+  animation: fadeUp .7s .6s ease both;
+}
+.corner-status strong {
+  display:block; color:rgba(255,255,255,.35);
+  margin-bottom:4px;
+}
+
+/* Coins déco (bracket style) */
+.corner-bracket {
+  position:absolute;
+  width:14px; height:14px;
+  border-color: rgba(255,255,255,.2);
+  border-style:solid;
+}
+.corner-bracket.tr { top:80px; right:48px; border-width:1px 1px 0 0; }
+.corner-bracket.br { bottom:40px; right:48px; border-width:0 1px 1px 0; }
+
+/* ===================== LOGIN CARD ===================== */
+.login-card {
+  position:relative; z-index:2;
+  background: rgba(15,15,17,0.92);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  animation: popupIn .6s .15s cubic-bezier(.16,1,.3,1) both;
+  box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 0.5px rgba(255,255,255,.06) inset;
+}
+
+/* Ligne lumineuse signature */
+.login-card::before {
+  content:'';
+  position:absolute; top:0; left:15%; right:15%;
+  height:0.5px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
+  border-radius:1px;
+}
+
+/* Card header tag */
+.card-tag {
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:20px;
+}
+
+.card-title {
+  font-family:'Bebas Neue', cursive;
+  font-size:38px; letter-spacing:2px;
+  margin-bottom:6px; font-weight:400;
+}
+
+.card-sub {
+  font-size:13px; font-weight:300;
+  color:var(--text-dim); margin-bottom:32px;
+  line-height:1.6;
+}
+
+/* ===================== INPUTS ===================== */
+.input-group {
+  position:relative; margin-bottom:14px;
+}
+
+.input-icon {
+  position:absolute; left:16px; top:50%;
+  transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px;
+  pointer-events:none;
+  transition: color .2s;
+}
+
+.input-group:focus-within .input-icon { color:var(--text-dim); }
+
+.input-field {
+  width:100%;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--border);
+  padding: 14px 16px 14px 42px;
+  border-radius: var(--radius-input);
+  color: var(--text);
+  font-family:'DM Sans', sans-serif;
+  font-size: 13px;
+  outline:none;
+  transition: border-color .2s, background .2s;
+}
+.input-field::placeholder { color:var(--text-faint); letter-spacing:.5px; font-size:12px; }
+.input-field:focus {
+  border-color: var(--border-bright);
+  background: rgba(255,255,255,.06);
+}
+
+/* Eye toggle */
+.input-toggle {
+  position:absolute; right:14px; top:50%;
+  transform:translateY(-50%);
+  background:none; border:none;
+  color:var(--text-faint); cursor:pointer;
+  font-size:13px; padding:4px;
+  transition: color .2s;
+}
+.input-toggle:hover { color:var(--text-dim); }
+
+/* ===================== ROW REMEMBER / FORGOT ===================== */
+.row-meta {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px; margin-top:4px;
+}
+
+.remember-label {
+  display:flex; align-items:center; gap:8px;
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-dim); cursor:pointer;
+  user-select:none;
+}
+
+.custom-checkbox {
+  width:14px; height:14px;
+  border:0.5px solid var(--border-bright);
+  border-radius:3px;
+  background:transparent;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition: background .2s, border-color .2s;
+}
+#remember-me:checked + .remember-label .custom-checkbox {
+  background:#fff;
+  border-color:#fff;
+}
+#remember-me:checked + .remember-label .custom-checkbox::after {
+  content:'✓';
+  color:#000; font-size:9px; font-weight:900;
+}
+#remember-me { display:none; }
+
+.forgot-link {
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text-faint); text-decoration:none;
+  transition: color .2s;
+}
+.forgot-link:hover { color:var(--text); }
+
+/* ===================== BOUTON PRINCIPAL ===================== */
+.btn-login {
+  width:100%;
+  padding:16px;
+  background:var(--text);
+  color:#000;
+  border:none;
+  border-radius: var(--radius-input);
+  font-family:'Space Mono', monospace;
+  font-size:11px; letter-spacing:3px; text-transform:uppercase;
+  font-weight:700; cursor:pointer;
+  transition: transform .2s, box-shadow .2s;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-bottom:4px;
+}
+.btn-login:hover {
+  transform:translateY(-1px) scale(1.01);
+  box-shadow:0 0 28px rgba(255,255,255,.22);
+}
+.btn-login:active { transform:scale(.98); }
+.btn-arrow { font-size:14px; }
+
+/* ===================== SÉPARATEUR OR ===================== */
+.divider {
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:20px;
+}
+.divider::before, .divider::after {
+  content:''; flex:1; height:0.5px;
+  background:var(--border);
+}
+.divider span {
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--text-faint);
+}
+
+/* ===================== BOUTON GHOST ===================== */
+.btn-ghost-card {
+  width:100%;
+  padding:14px;
+  background:transparent;
+  color:var(--text-dim);
+  border:0.5px solid var(--border);
+  border-radius:var(--radius-input);
+  font-family:'Space Mono', monospace;
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  font-weight:700; cursor:pointer;
+  transition: border-color .2s, color .2s, background .2s;
+}
+.btn-ghost-card:hover {
+  border-color:var(--border-bright);
+  color:var(--text);
+  background:rgba(255,255,255,.04);
+}
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes popupIn {
+  from { opacity:0; transform:scale(.97) translateY(12px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+
+/* ===================== ERROR MSG ===================== */
+.error-msg {
+  font-family:'Space Mono', monospace;
+  font-size:9px; letter-spacing:1px; text-transform:uppercase;
+  color:#ff453a; display:none;
+  margin-bottom:12px; text-align:center;
+}
+.login-warning {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+  text-align: center;
+  margin-top: 4px;
+  margin-bottom: 14px; /* 👈 équilibre avec bouton */
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 900px) {
+  nav { padding:16px 24px; }
+  .nav-links, .nav-cta { display:none; }
+  .hamburger { display:flex; }
+
+  .login-page { grid-template-columns:1fr; padding-top:56px; }
+  .left-panel { display:none; }
+  .right-panel {
+    padding:32px 20px;
+    min-height:calc(100vh - 56px);
+    background:
+      radial-gradient(ellipse 70% 60% at 80% 80%, rgba(180,180,180,.04) 0%, transparent 55%);
+  }
+  .radar-bg, .radar-sweep, .corner-status, .corner-bracket { display:none; }
+  .login-card { max-width:420px; }
+}
+
+@media (max-width: 480px) {
+  .login-card { padding:32px 20px; border-radius:16px; }
+  .card-title { font-size:30px; }
+}
+
+</style>
+<!-- Font Awesome pour les icônes input -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="assets/icon.png" alt="Bullet Logo">
+    BULLET
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#features">Features</a></li>
+    <li><a href="index.html#screens">App</a></li>
+    <li><a href="index.html#opensource">Open Source</a></li>
+    <li><a href="index.html#credits">Credits</a></li>
+  </ul>
+  <a href="#" class="nav-cta install-btn" onclick="installApp(); return false;">Install PWA</a>
+  <button class="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- LAYOUT SPLIT -->
+<div class="login-page">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-content">
+      <div class="eyebrow" style="animation:fadeUp .7s .05s ease both;">Password Manager</div>
+      <h1 class="hero-title">ACCESS.<br>SECURED.</h1>
+      <p class="hero-sub">Your credentials. Encrypted.<br>Your data. Under your control.</p>
+    </div>
+
+    <div class="left-footer">
+      <div class="left-footer-label">
+        <span class="status-dot"></span>
+        SECURE BY DEFAULT
+      </div>
+      <div class="left-footer-specs">
+        AES-256 ENCRYPTION<br>
+        ZERO KNOWLEDGE ARCHITECTURE
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Radar SVG -->
+    <svg class="radar-bg" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="200" r="190" stroke="white" stroke-width="1"/>
+      <circle cx="200" cy="200" r="150" stroke="white" stroke-width="0.5"/>
+      <circle cx="200" cy="200" r="110" stroke="white" stroke-width="1"/>
+      <circle cx="200" cy="200" r="70"  stroke="white" stroke-width="0.5"/>
+      <circle cx="200" cy="200" r="30"  stroke="white" stroke-width="1.5"/>
+      <line x1="200" y1="10"  x2="200" y2="390" stroke="white" stroke-width="0.5"/>
+      <line x1="10"  y1="200" x2="390" y2="200" stroke="white" stroke-width="0.5"/>
+      <line x1="55"  y1="55"  x2="345" y2="345" stroke="white" stroke-width="0.5"/>
+      <line x1="345" y1="55"  x2="55"  y2="345" stroke="white" stroke-width="0.5"/>
+      <circle cx="200" cy="200" r="5" fill="white"/>
+    </svg>
+
+    <!-- Sweep lumineux -->
+    <svg class="radar-sweep" viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sweepGrad" x1="350" y1="350" x2="700" y2="350" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="white" stop-opacity="0"/>
+          <stop offset="100%" stop-color="white" stop-opacity="0.6"/>
+        </linearGradient>
+      </defs>
+      <line x1="350" y1="350" x2="700" y2="350" stroke="url(#sweepGrad)" stroke-width="1.5"/>
+    </svg>
+
+    <!-- Coins déco -->
+    <div class="corner-bracket tr"></div>
+    <div class="corner-bracket br"></div>
+
+    <!-- Status bas-droite -->
+    <div class="corner-status">
+      <strong>STATUS</strong>
+      ALL SYSTEMS OPERATIONAL
+    </div>
+
+    <!-- CARD LOGIN -->
+    <div class="login-card" id="login-card">
+
+      <div class="card-tag">LOGIN</div>
+      <h2 class="card-title">WELCOME BACK</h2>
+      <p class="card-sub">Log in to access your vault</p>
+
+      <p class="error-msg" id="login-error">Incorrect credentials</p>
+
+      <!-- Nickname -->
+      <div class="input-group">
+        <span class="input-icon"><i class="fa-solid fa-user"></i></span>
+        <input
+          type="text"
+          id="nickname"
+          class="input-field"
+          placeholder="Nickname"
+          autocomplete="username"
+        >
+      </div>
+
+      <!-- Password -->
+      <div class="input-group">
+        <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
+        <input
+          type="password"
+          id="master-password"
+          class="input-field"
+          placeholder="Master Password"
+          autocomplete="current-password"
+        >
+        <button class="input-toggle" type="button" id="toggle-pass" aria-label="Show password">
+          <i class="fa-regular fa-eye" id="eye-icon"></i>
+        </button>
+      </div>
+
+      <!-- Remember / Forgot -->
+      <div class="row-meta">
+        <input type="checkbox" id="remember-me">
+        <label for="remember-me" class="remember-label">
+          <span class="custom-checkbox"></span>
+          Remember me
+        </label>
+      </div>
+<p class="login-warning">
+  No recovery. If you lose your password, your vault is lost.
+</p>
+      <!-- Login button -->
+      <button class="btn-login" id="unlock-btn" onclick="checkMasterPassword()">
+        LOG IN <span class="btn-arrow">→</span>
+      </button>
+
+    </div>
+    <!-- /login-card -->
+
+  </div>
+  <!-- /right-panel -->
+
+</div>
+<script src="scripts/crypto.js"></script>
+<script src="/scripts/pwa.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // =========================
+  // 🔁 MODE CREATE / LOGIN
+  // =========================
+  const hasVault = localStorage.getItem("bullet_vault");
+
+  if (!hasVault) {
+    document.querySelector(".card-title").textContent = "CREATE VAULT";
+    document.querySelector(".card-sub").textContent = "Set your master password";
+    document.getElementById("unlock-btn").innerHTML = 'CREATE →';
+  }
+
+  // =========================
+  // 👤 AUTO FILL USERNAME
+  // =========================
+  const savedName = localStorage.getItem("bullet_nickname");
+
+  console.log("AUTO FILL:", savedName);
+
+  if (savedName) {
+      const input = document.getElementById("nickname");
+      const checkbox = document.getElementById("remember-me");
+
+      if (input) input.value = savedName;
+      if (checkbox) checkbox.checked = true;
+
+      const box = document.querySelector('.custom-checkbox');
+      if (box) {
+          box.innerHTML = '<span style="color:#000;font-size:9px;font-weight:900;">✓</span>';
+          box.style.background = '#fff';
+          box.style.borderColor = '#fff';
+      }
+  }
+
+  // =========================
+  // 👁️ TOGGLE PASSWORD
+  // =========================
+  document.getElementById('toggle-pass').addEventListener('click', () => {
+    const input = document.getElementById('master-password');
+    const icon  = document.getElementById('eye-icon');
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fa-regular fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fa-regular fa-eye';
+    }
+  });
+
+  // =========================
+  // ✅ CHECKBOX STYLE
+  // =========================
+  document.getElementById('remember-me').addEventListener('change', function() {
+    const box = document.querySelector('.custom-checkbox');
+
+    if (this.checked) {
+      box.innerHTML = '<span style="color:#000;font-size:9px;font-weight:900;">✓</span>';
+      box.style.background = '#fff';
+      box.style.borderColor = '#fff';
+    } else {
+      box.innerHTML = '';
+      box.style.background = '';
+      box.style.borderColor = '';
+    }
+  });
+
+  // =========================
+  // ⌨️ ENTER KEY
+  // =========================
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkMasterPassword();
+  });
+
+});
+
+// =========================
+// 🔐 LOGIN FUNCTION (hors DOMContentLoaded)
+// =========================
+async function checkMasterPassword() {
+
+    const pass = document.getElementById('master-password').value;
+    if (!pass) return;
+
+    const encrypted = localStorage.getItem('bullet_vault');
+
+    try {
+        // 🟢 CAS LOGIN
+        if (encrypted) {
+            await decryptVault(encrypted, pass);
+        } 
+        // 🔥 CAS CREATE ACCOUNT
+        else {
+            const emptyVault = [];
+            const encryptedVault = await encryptVault(emptyVault, pass);
+            localStorage.setItem('bullet_vault', encryptedVault);
+            console.log("🆕 Vault created");
+        }
+
+        // 🔐 SESSION
+        localStorage.setItem("masterPass", pass);
+        localStorage.setItem("isLogged", "true");
+
+        window.currentMasterPass = pass;
+
+        // 🚀 GO APP
+        window.location.href = "app.html";
+
+    } catch (e) {
+        console.error("LOGIN ERROR:", e);
+        alert("Wrong password or error");
+    }
+}
+</script>
+
+</body>
+</html>
