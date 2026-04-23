@@ -6,7 +6,7 @@ function createWindow() {
     height: 800,
     autoHideMenuBar: true,
     webPreferences: {
-      devTools: true, // 🔥 TOUJOURS désactivé
+      devTools: true,
       contextIsolation: true,
       nodeIntegration: false
     }
@@ -14,25 +14,7 @@ function createWindow() {
 
   win.loadFile('login.html');
 
-  // 🔥 bloque ouverture DevTools
-  win.webContents.on('devtools-opened', () => {
-    win.webContents.closeDevTools();
-  });
-
-  // 🔥 bloque raccourcis clavier
-  win.webContents.on('before-input-event', (event, input) => {
-    if (
-      input.key === 'F12' ||
-      (input.control && input.shift && ['i', 'j', 'c'].includes(input.key.toLowerCase()))
-    ) {
-      event.preventDefault();
-    }
-  });
-
-  // 🔥 bloque clic droit
-  win.webContents.on('context-menu', (e) => {
-    e.preventDefault();
-  });
+  // 🔓 DEBUG MODE → rien de bloqué
 }
 
 app.whenReady().then(createWindow);

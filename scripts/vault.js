@@ -5,21 +5,40 @@ let isVaultLoading = false;
 window.cachedVault = null;
 let isRefreshing = false;
 async function addEntryToVault() {
-    const url = document.getElementById('vault-site').value;
+    let site = document.getElementById('vault-site').value.trim();
     const user = document.getElementById('vault-user').value;
     const password = document.getElementById('vault-pass').value;
 
-    if (!url || !user || !password) return;
+    if (!site || !user || !password) return;
 
-    const domain = getDomainName(url);
+    let domain = site;
+    let finalUrl = site;
+    let logo = "";
+
+    try {
+        // 👉 si c’est une vraie URL
+        const urlObj = new URL(site.startsWith('http') ? site : 'https://' + site);
+
+        domain = urlObj.hostname.replace('www.', '');
+        finalUrl = urlObj.href;
+
+        logo = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+    } catch {
+        // 👉 si c’est juste du texte (Netflix, Discord…)
+        domain = site;
+        finalUrl = site;
+
+        // 👉 logo vide ou placeholder
+        logo = "assets/gun.png"; // ou une icône par défaut
+    }
 
     const entry = { 
         id: Date.now(), 
-        url: url.toLowerCase(), 
+        url: finalUrl.toLowerCase(), 
         domain: domain,
         user: user, 
         pass: password,
-        logo: `https://www.google.com/s2/favicons?sz=64&domain=${url}`
+        logo: logo
     };
 
     let vault = await getVault();

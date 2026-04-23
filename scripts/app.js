@@ -1,5 +1,5 @@
 
-const pwnedCache = {};
+
 // ==========================================
 // 2. NAVIGATION
 // ==========================================
@@ -416,9 +416,9 @@ async function checkPasswordPwned(password) {
         return null;
     }
 }
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js")
-        .catch(err => console.error("SW error:", err));
+if ('serviceWorker' in navigator && !navigator.userAgent.toLowerCase().includes('electron')) {
+  navigator.serviceWorker.register('sw.js')
+    .catch(err => console.log("SW error:", err));
 }
 
 // ============================================

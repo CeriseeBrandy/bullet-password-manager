@@ -331,7 +331,7 @@ window.loadVault = async function () {
 
     gDiv.innerHTML = `
       <div class="vault-group-header">
-        <img src="${accounts[0].logo}" onerror="this.style.display='none'">
+       <img src="${accounts[0].logo}" onerror="this.src='assets/gun.png'">
         <span class="vault-group-name">${domain}</span>
         <span class="vault-group-count">${accounts.length}</span>
       </div>
