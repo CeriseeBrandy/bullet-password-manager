@@ -43,40 +43,38 @@ async function addEntryToVault() {
 
 
 async function getVault() {
+  try {
+    const encrypted = localStorage.getItem('bullet_vault');
 
-    // ✅ cache FIRST
-    if (cachedVault) {s
-        return cachedVault;
+    // 👉 aucun coffre
+    if (!encrypted) {
+      
+      return [];
     }
 
+    // 👉 récup mot de passe session
     const pass = sessionStorage.getItem("masterPass");
 
     if (!pass) {
-        console.warn("NO MASTER PASS");
-        return [];
+      console.warn("No master password in session");
+      return [];
     }
 
-    const encrypted = localStorage.getItem("bullet_vault");
+    // 👉 déchiffrement
+    const vault = await decryptVault(encrypted, pass);
 
-    if (!encrypted) {
-        
-        return [];
+    // 👉 sécurité
+    if (!Array.isArray(vault)) {
+      console.error("Vault corrupted");
+      return [];
     }
 
-    try {
-        const vault = await decryptVault(encrypted, pass);
+    return vault;
 
-        
-
-        // 🔥 cache
-        cachedVault = Array.isArray(vault) ? vault : [];
-
-        return cachedVault;
-
-    } catch (e) {
-        console.error("DECRYPT FAILED", e);
-        return [];
-    }
+  } catch (e) {
+    console.error("getVault error:", e);
+    return [];
+  }
 }
 
 async function saveVaultEntry(id) {

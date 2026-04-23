@@ -1,3 +1,10 @@
+function safe(text) {
+  if (!text) return "";
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
 function _patchPwnedStatus(passId, status) {
   document.querySelectorAll(`[data-pass-id="${passId}"]`).forEach(el => {
     el.textContent =
@@ -50,52 +57,48 @@ function closeSlideNav() {
    - syncer sidebar + slide nav mobile + topbar title
 ========================================================= */
 (function () {
-  const _orig = window.showSection;
 
   window.showSection = function (name) {
-    /* 1. Masquer toutes les sections proprement */
-    ['generator', 'vault', 'backup', 'about', 'settings'].forEach(id => {
-      const el = document.getElementById(id + '-view');
-      if (el) { el.classList.remove('active'); el.style.display = ''; }
+
+    // 1. cacher toutes les sections
+    document.querySelectorAll('.view-section').forEach(sec => {
+      sec.classList.remove('active');
     });
 
-    /* 2. Logique métier originale (chargement vault, etc.) */
-    if (typeof _orig === 'function') _orig(name);
-
-    /* 3. Afficher la bonne section via classe */
+    // 2. afficher la bonne
     const target = document.getElementById(name + '-view');
     if (target) {
-      target.style.display = '';
       target.classList.add('active');
     }
 
-    /* 4. Sidebar desktop */
+    // 3. sidebar desktop
     document.querySelectorAll('.s-item').forEach(el => el.classList.remove('active'));
     const desk = document.getElementById('btn-' + name);
     if (desk) desk.classList.add('active');
 
-    /* 5. Slide nav mobile */
+    // 4. mobile nav
     document.querySelectorAll('.slide-nav-item').forEach(el => el.classList.remove('active'));
     const mob = document.getElementById('mob-btn-' + name);
     if (mob) mob.classList.add('active');
 
-    /* 6. Topbar title */
+    // 5. topbar
     const titles = {
       generator: 'Generator',
-      vault:     'Vault',
-      backup:    'Backup',
-      about:     'Security',
-      settings:  'Settings'
+      vault: 'Vault',
+      backup: 'Backup',
+      about: 'Security',
+      settings: 'Settings'
     };
+
     const tb = document.getElementById('topbar-title');
     if (tb) tb.textContent = titles[name] || name;
+
+    // 6. charger vault si nécessaire
+    if (name === 'vault' && typeof loadVault === 'function') {
+      loadVault();
+    }
   };
 
-  /* Assurer que le generator est visible au chargement */
-  window.addEventListener('load', () => {
-    const gen = document.getElementById('generator-view');
-    if (gen) { gen.style.display = ''; gen.classList.add('active'); }
-  });
 })();
 
 /* =========================================================
@@ -345,7 +348,7 @@ window.loadVault = async function () {
       eDiv.innerHTML = `
         <div class="entry-main-tile">
           <div class="entry-left">
-            <div class="entry-user">${acc.user}</div>
+            <div class="entry-user">${safe(acc.user)}</div>
             <div class="entry-status pending" data-pass-id="p${acc.id}">· Checking…</div>
           </div>
         </div>
@@ -413,13 +416,13 @@ window.openEditTile = async function (id) {
         </div>
         <div>
           <h3 style="margin:0;font-size:.95rem;letter-spacing:3px;">EDIT ENTRY</h3>
-          <div style="font-size:11px;color:var(--text-faint);margin-top:3px;font-weight:300;">${acc.domain} · ${acc.url}</div>
+          <div style="font-size:11px;color:var(--text-faint);margin-top:3px;font-weight:300;">${safe(acc.domain)} · ${acc.url}</div>
         </div>
       </div>
       <label style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:8px;">
         <i class="fa-solid fa-at" style="margin-right:6px;opacity:.6;"></i>Identifier
       </label>
-      <input type="text" id="edit-user" value="${acc.user}"
+      <input type="text" id="edit-user" value="${safe(acc.user)}"
         style="width:100%;background:rgba(255,255,255,.04);border:.5px solid var(--border);padding:12px 16px;border-radius:var(--radius-md);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:18px;transition:border-color .2s;">
       <label style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:8px;">
         <i class="fa-solid fa-lock" style="margin-right:6px;opacity:.6;"></i>Password

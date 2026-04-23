@@ -1,0 +1,46 @@
+{
+  "name": "bulletappclean",
+  "version": "1.0.0",
+  "description": "Bullet Password Manager",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CeriseeBrandy/bullet-password-manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^41.3.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.bullet.app",
+    "productName": "Bullet",
+    "artifactName": "Bullet-Setup.exe",
+    "directories": {
+      "buildResources": "assets"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Bullet",
+      "runAfterFinish": true
+    }
+  }
+}

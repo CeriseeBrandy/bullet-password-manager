@@ -1001,3 +1001,6 @@ body::before {
   color: #ff453a !important;
   background: rgba(255, 69, 58, 0.1) !important;
 }
+body.electron .sidebar {
+  display: flex !important;
+}

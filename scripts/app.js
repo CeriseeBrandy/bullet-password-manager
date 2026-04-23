@@ -98,10 +98,10 @@ function openEditTile(id) {
             <div class="edit-body">
 
                 <label>USERNAME</label>
-                <input id="edit-user" value="${entry.user}">
+                <input id="edit-user" value="${safe(entry.user)}">
 
                 <label>PASSWORD</label>
-                <input id="edit-pass" value="${entry.pass}">
+                <input id="edit-pass" value="${safe(entry.pass)}">
 
             </div>
 
@@ -483,7 +483,7 @@ async function checkMasterPassword() {
             const encrypted = await encryptVault(emptyVault, password);
             localStorage.setItem("bullet_vault", encrypted);
 
-            console.log("NEW VAULT CREATED");
+            
         } else {
             // 🔐 vérifier mot de passe
             await decryptVault(localStorage.getItem("bullet_vault"), password);

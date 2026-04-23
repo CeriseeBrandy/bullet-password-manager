@@ -62,11 +62,15 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     resetInactivityTimer();
 
+    
     // 📦 LOAD VAULT
-    if (!window.__vaultLoaded) {
-        window.__vaultLoaded = true;
+if (!window.__vaultLoaded) {
+    window.__vaultLoaded = true;
+
+    setTimeout(() => {
         loadVault();
-    }
+    }, 50);
+}
 });
 
 // ⚙️ Settings

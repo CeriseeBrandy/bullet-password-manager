@@ -1,3 +1,20 @@
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const isElectron = navigator.userAgent.toLowerCase().includes('electron');
+
+  
+
+  if (isElectron) {
+  document.body.classList.add('electron');
+
+  // 🔥 SUPPRIME LA NAVBAR DU LOGIN / SITE
+  document.querySelector('.landing-nav')?.remove();
+
+  // 🔥 SUPPRIME LE BOUTON PWA
+  document.querySelector('.install-btn')?.remove();
+}
+});
 const pwnedCache = {};
 function showSection(name) {
 
@@ -47,10 +64,10 @@ function openEditTile(id) {
 
             <div class="edit-body">
                 <label>USERNAME</label>
-                <input id="edit-user" value="${entry.user}">
+                <input id="edit-user" value="${safe(entry.user)}">
 
                 <label>PASSWORD</label>
-                <input id="edit-pass" value="${entry.pass}">
+                <input id="edit-pass" value="${safe(entry.pass)}">
             </div>
 
             <div class="edit-actions">

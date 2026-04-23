@@ -8,7 +8,7 @@
 <title>Bullet — Login</title>
 
 <!-- 🔥 FAVICON ICI -->
-<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="icon" type="image/png" href="assets/favicon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -464,7 +464,7 @@ nav {
 <body>
 
 <!-- NAV -->
-<nav>
+<nav class="landing-nav">
   <a href="index.html" class="nav-logo">
     <img src="assets/icon.png" alt="Bullet Logo">
     BULLET
@@ -601,107 +601,81 @@ nav {
   <!-- /right-panel -->
 
 </div>
+<script src="scripts/core.js"></script>
 <script src="scripts/crypto.js"></script>
-<script src="/scripts/pwa.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  // =========================
-  // 🔁 MODE CREATE / LOGIN
-  // =========================
-  const hasVault = localStorage.getItem("bullet_vault");
-
-  if (!hasVault) {
-    document.querySelector(".card-title").textContent = "CREATE VAULT";
-    document.querySelector(".card-sub").textContent = "Set your master password";
-    document.getElementById("unlock-btn").innerHTML = 'CREATE →';
+  // 🔥 PWA seulement sur le web (pas Electron)
+  if (!navigator.userAgent.toLowerCase().includes('electron')) {
+    const script = document.createElement('script');
+    script.src = "scripts/pwa.js";
+    document.body.appendChild(script);
   }
-  // ==============================
-// 🔁 AUTO FILL USERNAME
-// ==============================
-const savedName = localStorage.getItem("bullet_nickname");
 
-console.log("AUTO FILL:", savedName);
+  // =========================
+  // 🚀 INIT PAGE
+  // =========================
+  document.addEventListener("DOMContentLoaded", () => {
 
-if (savedName) {
-    const input = document.getElementById("nickname");
-    const checkbox = document.getElementById("remember-me");
+    // 🔁 MODE CREATE / LOGIN
+    const hasVault = localStorage.getItem("bullet_vault");
 
-    if (input) input.value = savedName;
-    if (checkbox) checkbox.checked = true;
+    if (!hasVault) {
+      document.querySelector(".card-title").textContent = "CREATE VAULT";
+      document.querySelector(".card-sub").textContent = "Set your master password";
+      document.getElementById("unlock-btn").innerHTML = 'CREATE →';
+    }
 
-    const box = document.querySelector('.custom-checkbox');
-    if (box) {
+    // 🔁 AUTO FILL USERNAME
+    const savedName = localStorage.getItem("bullet_nickname");
+
+    if (savedName) {
+      const input = document.getElementById("nickname");
+      const checkbox = document.getElementById("remember-me");
+
+      if (input) input.value = savedName;
+      if (checkbox) checkbox.checked = true;
+    }
+
+    // 👁️ TOGGLE PASSWORD
+    document.getElementById('toggle-pass').addEventListener('click', () => {
+      const input = document.getElementById('master-password');
+      const icon  = document.getElementById('eye-icon');
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    });
+
+    // ✅ CHECKBOX STYLE
+    document.getElementById('remember-me').addEventListener('change', function() {
+      const box = document.querySelector('.custom-checkbox');
+
+      if (this.checked) {
         box.innerHTML = '<span style="color:#000;font-size:9px;font-weight:900;">✓</span>';
         box.style.background = '#fff';
         box.style.borderColor = '#fff';
-    }
-}
+      } else {
+        box.innerHTML = '';
+        box.style.background = '';
+        box.style.borderColor = '';
+      }
+    });
 
-// ==============================
-// 💾 SAVE USERNAME (REMEMBER ME)
-// ==============================
-function handleRememberMe() {
-    const input = document.getElementById("nickname");
-    const checkbox = document.getElementById("remember-me");
+    // ⌨️ ENTER KEY
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkMasterPassword();
+    });
 
-    if (!input || !checkbox) return;
-
-    const nickname = input.value;
-
-    if (checkbox.checked) {
-        localStorage.setItem("bullet_nickname", nickname);
-    } else {
-        localStorage.removeItem("bullet_nickname");
-    }
-}
-
-  // =========================
-  // 👁️ TOGGLE PASSWORD
-  // =========================
-  document.getElementById('toggle-pass').addEventListener('click', () => {
-    const input = document.getElementById('master-password');
-    const icon  = document.getElementById('eye-icon');
-
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon.className = 'fa-regular fa-eye-slash';
-    } else {
-      input.type = 'password';
-      icon.className = 'fa-regular fa-eye';
-    }
   });
 
   // =========================
-  // ✅ CHECKBOX STYLE
+  // 🔐 LOGIN FUNCTION
   // =========================
-  document.getElementById('remember-me').addEventListener('change', function() {
-    const box = document.querySelector('.custom-checkbox');
-
-    if (this.checked) {
-      box.innerHTML = '<span style="color:#000;font-size:9px;font-weight:900;">✓</span>';
-      box.style.background = '#fff';
-      box.style.borderColor = '#fff';
-    } else {
-      box.innerHTML = '';
-      box.style.background = '';
-      box.style.borderColor = '';
-    }
-  });
-
-  // =========================
-  // ⌨️ ENTER KEY
-  // =========================
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') checkMasterPassword();
-  });
-
-});
-
-// =========================
-// 🔐 LOGIN FUNCTION (hors DOMContentLoaded)
-// =========================
-async function checkMasterPassword() {
+  window.checkMasterPassword = async function () {
 
     const pass = document.getElementById('master-password').value;
     const nickname = document.getElementById('nickname')?.value;
@@ -712,40 +686,27 @@ async function checkMasterPassword() {
     const encrypted = localStorage.getItem('bullet_vault');
 
     try {
-        // 🟢 LOGIN
-        if (encrypted) {
-            await decryptVault(encrypted, pass);
-        } 
-        // 🔥 CREATE ACCOUNT
-        else {
-            const emptyVault = [];
-            const encryptedVault = await encryptVault(emptyVault, pass);
-            localStorage.setItem('bullet_vault', encryptedVault);
-            console.log("🆕 Vault created");
-        }
+      if (encrypted) {
+        await decryptVault(encrypted, pass);
+      } else {
+        const encryptedVault = await encryptVault([], pass);
+        localStorage.setItem('bullet_vault', encryptedVault);
+      }
 
-        // 🔐 SESSION (SANS password stocké)
-        localStorage.setItem("isLogged", "true");
+      localStorage.setItem("isLogged", "true");
+      sessionStorage.setItem("masterPass", pass);
 
-        // 🔥 PASSWORD EN MÉMOIRE SEULEMENT
-        sessionStorage.setItem("masterPass", pass);
+      if (remember && nickname) {
+        localStorage.setItem("bullet_nickname", nickname);
+      } else {
+        localStorage.removeItem("bullet_nickname");
+      }
 
-        // 👤 REMEMBER USERNAME
-        if (remember && nickname) {
-            localStorage.setItem("bullet_nickname", nickname);
-        } else {
-            localStorage.removeItem("bullet_nickname");
-        }
-
-        // 🚀 GO APP
-        window.location.href = "app.html";
+      window.location.href = "app.html";
 
     } catch (e) {
-        console.error("LOGIN ERROR:", e);
-        alert("Wrong password or error");
+      console.error("LOGIN ERROR:", e);
+      alert("Wrong password or error");
     }
-}
+  };
 </script>
-
-</body>
-</html>

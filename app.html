@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bullet — Password Manager</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="/assets/flavicon.png">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
 
@@ -300,12 +300,21 @@
   <button class="slide-nav-item" id="mob-btn-settings" onclick="showSection('settings');closeSlideNav()"><i class="fa-solid fa-gear"></i> Settings</button>
 </nav>
 
-<script src="/scripts/crypto.js"></script>
-<script src="/scripts/vault.js"></script>
-<script src="/scripts/session.js"></script>
-<script src="/scripts/pwa.js"></script>
-<script src="/scripts/core.js"></script>
-<script src="/scripts/ui.js"></script>
+<!-- tes autres scripts -->
+<script src="scripts/crypto.js"></script>
+<script src="scripts/vault.js"></script>
+<script src="scripts/session.js"></script>
+<script src="scripts/core.js"></script>
+<script src="scripts/ui.js"></script>
+
+<!-- 🔥 PWA conditionnel -->
+<script>
+  if (!navigator.userAgent.toLowerCase().includes('electron')) {
+    const script = document.createElement('script');
+    script.src = "scripts/pwa.js";
+    document.body.appendChild(script);
+  }
+</script>
 
 </body>
 </html>
