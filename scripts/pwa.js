@@ -1,16 +1,14 @@
 let deferredPrompt = null;
-console.log("PWA JS LOADED");
 // install prompt
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
 
-  console.log("✅ beforeinstallprompt fired");
 });
 
 // bouton install
 async function installApp() {
-  console.log("CLICK INSTALL");
+  
 
   if (!deferredPrompt) {
     alert("Install not available");
@@ -34,13 +32,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if (isPWAInstalled()) {
     btns.forEach(btn => btn.style.display = 'none');
-    console.log("📱 PWA mode → install button hidden");
+    
   }
 });
 
 // service worker
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js")
-    .then(reg => console.log("✅ SW registered"))
+  navigator.serviceWorker.register("/sw.js")    
     .catch(err => console.error(err));
 }

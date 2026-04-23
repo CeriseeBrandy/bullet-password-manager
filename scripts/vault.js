@@ -45,11 +45,11 @@ async function addEntryToVault() {
 async function getVault() {
 
     // ✅ cache FIRST
-    if (cachedVault) {
+    if (cachedVault) {s
         return cachedVault;
     }
 
-    const pass = window.currentMasterPass || localStorage.getItem("masterPass");
+    const pass = sessionStorage.getItem("masterPass");
 
     if (!pass) {
         console.warn("NO MASTER PASS");
@@ -59,14 +59,14 @@ async function getVault() {
     const encrypted = localStorage.getItem("bullet_vault");
 
     if (!encrypted) {
-        console.log("EMPTY VAULT");
+        
         return [];
     }
 
     try {
         const vault = await decryptVault(encrypted, pass);
 
-        console.log("DECRYPT RESULT:", vault);
+        
 
         // 🔥 cache
         cachedVault = Array.isArray(vault) ? vault : [];

@@ -4,9 +4,7 @@ let INACTIVITY_TIME = 2 * 60 * 1000;
 // 🔒 LOCK APP
 function lockApp() {
     localStorage.removeItem("isLogged");
-    localStorage.removeItem("masterPass");
-
-    window.currentMasterPass = null;
+    sessionStorage.removeItem("masterPass"); // 🔥 AJOUT
 
     window.location.href = "login.html";
 }
@@ -23,14 +21,14 @@ function resetInactivityTimer() {
 // 🎯 INIT
 window.addEventListener('DOMContentLoaded', async () => {
 
-    const pass = localStorage.getItem("masterPass");
+    const pass = sessionStorage.getItem("masterPass");
     const isLogged = localStorage.getItem("isLogged");
 
-    console.log("SESSION CHECK:", { isLogged, pass });
+    
 
     // ❌ PAS LOG → redirect
-    if (!isLogged || !pass) {
-        console.log("❌ Not logged → redirect");
+     if (!isLogged) {
+        
         window.location.href = "login.html";
         return;
     }
@@ -42,10 +40,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         // 🔥 clé en mémoire
         window.currentMasterPass = pass;
 
-        console.log("✅ Session restored");
+        
 
     } catch (e) {
-        console.log("❌ SESSION INVALID → RESET");
+        
 
         localStorage.removeItem("isLogged");
         localStorage.removeItem("masterPass");

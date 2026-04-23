@@ -100,8 +100,8 @@ async function encryptVault(vault, password) {
 // 🔐 DECRYPT VAULT
 // ==============================
 async function decryptVault(encryptedData, password) {
-    console.log("DECRYPT START");
-    console.log("PASSWORD USED:", password);
+    
+    
 
     const parsed = JSON.parse(encryptedData);
 
@@ -120,7 +120,7 @@ async function decryptVault(encryptedData, password) {
     const dec = new TextDecoder();
     const result = JSON.parse(dec.decode(decrypted));
 
-    console.log("DECRYPT RESULT:", result);
+    
 
     return result;
 }

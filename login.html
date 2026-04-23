@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Bullet — Login</title>
+
+<!-- 🔥 FAVICON ICI -->
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
 
 /* ===================== RESET ===================== */
@@ -609,8 +616,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".card-sub").textContent = "Set your master password";
     document.getElementById("unlock-btn").innerHTML = 'CREATE →';
   }
-
-
   // ==============================
 // 🔁 AUTO FILL USERNAME
 // ==============================
@@ -699,16 +704,19 @@ function handleRememberMe() {
 async function checkMasterPassword() {
 
     const pass = document.getElementById('master-password').value;
+    const nickname = document.getElementById('nickname')?.value;
+    const remember = document.getElementById('remember-me')?.checked;
+
     if (!pass) return;
 
     const encrypted = localStorage.getItem('bullet_vault');
 
     try {
-        // 🟢 CAS LOGIN
+        // 🟢 LOGIN
         if (encrypted) {
             await decryptVault(encrypted, pass);
         } 
-        // 🔥 CAS CREATE ACCOUNT
+        // 🔥 CREATE ACCOUNT
         else {
             const emptyVault = [];
             const encryptedVault = await encryptVault(emptyVault, pass);
@@ -716,11 +724,18 @@ async function checkMasterPassword() {
             console.log("🆕 Vault created");
         }
 
-        // 🔐 SESSION
-        localStorage.setItem("masterPass", pass);
+        // 🔐 SESSION (SANS password stocké)
         localStorage.setItem("isLogged", "true");
 
-        window.currentMasterPass = pass;
+        // 🔥 PASSWORD EN MÉMOIRE SEULEMENT
+        sessionStorage.setItem("masterPass", pass);
+
+        // 👤 REMEMBER USERNAME
+        if (remember && nickname) {
+            localStorage.setItem("bullet_nickname", nickname);
+        } else {
+            localStorage.removeItem("bullet_nickname");
+        }
 
         // 🚀 GO APP
         window.location.href = "app.html";
