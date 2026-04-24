@@ -613,6 +613,11 @@
     .github-card { padding: 20px; }
     .credit-card { padding: 24px 20px; }
   }
+.nav-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
 </style>
 </head>
 <body>
@@ -641,21 +646,42 @@ if (isPWA) {
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">
-    <img src="\assets\bullet-logo.png" alt="Bullet Logo">
+    <img src="/assets/bullet-logo.png" alt="Bullet Logo">
     BULLET
   </a>
+
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#screens">App</a></li>
     <li><a href="#opensource">Open Source</a></li>
     <li><a href="#credits">Credits</a></li>
   </ul>
-  <a href="#" class="nav-cta install-btn" onclick="installApp(); return false;">Install PWA</a>
+
+  <div class="nav-actions">
+
+    <a 
+      href="https://github.com/CeriseeBrandy/bullet-password-manager/releases/download/v1.0.0/Bullet-Setup.exe"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="nav-cta download-btn"
+    >
+      Windows Download
+    </a>
+
+    <a 
+      href="#" 
+      class="nav-cta install-btn" 
+      onclick="installApp(); return false;"
+    >
+      Install PWA
+    </a>
+
+  </div>
+
   <button class="hamburger" id="hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
 </nav>
-
 <main>
 
   <!-- HERO -->
