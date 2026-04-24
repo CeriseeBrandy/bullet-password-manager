@@ -23,16 +23,23 @@
     "appId": "com.bullet.app",
     "productName": "Bullet",
     "artifactName": "Bullet-Setup.exe",
+
+    "asar": false,
+
     "directories": {
       "buildResources": "assets"
     },
+
     "files": [
-      "**/*"
+      "**/*",
+      "assets/**/*"
     ],
+
     "win": {
       "target": "nsis",
       "icon": "icon.ico"
     },
+
     "nsis": {
       "oneClick": false,
       "perMachine": false,
